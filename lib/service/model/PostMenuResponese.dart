@@ -1,6 +1,3 @@
-// To parse this JSON data, do
-//
-//     final postMenuResponse = postMenuResponseFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -10,45 +7,48 @@ String postMenuResponseToJson(PostMenuResponse data) => json.encode(data.toJson(
 
 class PostMenuResponse {
     String message;
-    Menu menu;
+    Data data;
 
     PostMenuResponse({
         required this.message,
-        required this.menu,
+        required this.data,
     });
 
     factory PostMenuResponse.fromJson(Map<String, dynamic> json) => PostMenuResponse(
         message: json["message"],
-        menu: Menu.fromJson(json["menu"]),
+        data: Data.fromJson(json["data"]),
     );
 
     Map<String, dynamic> toJson() => {
         "message": message,
-        "menu": menu.toJson(),
+        "data": data.toJson(),
     };
 }
 
-class Menu {
+class Data {
     String nama;
     String harga;
     String kategori;
+    String foto;
     DateTime updatedAt;
     DateTime createdAt;
     int id;
 
-    Menu({
+    Data({
         required this.nama,
         required this.harga,
         required this.kategori,
+        required this.foto,
         required this.updatedAt,
         required this.createdAt,
         required this.id,
     });
 
-    factory Menu.fromJson(Map<String, dynamic> json) => Menu(
+    factory Data.fromJson(Map<String, dynamic> json) => Data(
         nama: json["nama"],
         harga: json["harga"],
         kategori: json["kategori"],
+        foto: json["foto"],
         updatedAt: DateTime.parse(json["updated_at"]),
         createdAt: DateTime.parse(json["created_at"]),
         id: json["id"],
@@ -58,6 +58,7 @@ class Menu {
         "nama": nama,
         "harga": harga,
         "kategori": kategori,
+        "foto": foto,
         "updated_at": updatedAt.toIso8601String(),
         "created_at": createdAt.toIso8601String(),
         "id": id,

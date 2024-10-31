@@ -15,9 +15,8 @@ class _CreateMenuPageState extends State<CreateMenuPage> {
   final nama = TextEditingController();
   final harga = TextEditingController();
   final kategori = TextEditingController();
-  File? _image; // Menyimpan file gambar
-
-  // Fungsi untuk memilih gambar dari galeri
+  File? _image; 
+  
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -41,70 +40,73 @@ class _CreateMenuPageState extends State<CreateMenuPage> {
         ),
         title: const Text("Buat Menu"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Nama',
-                ),
-                controller: nama,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Harga',
-                ),
-                controller: harga,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Kategori',
-                ),
-                controller: kategori,
-              ),
-            ),
-            // Tombol untuk memilih gambar
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: const Text('Pilih Foto'),
-            ),
-            // Menampilkan gambar yang dipilih
-            if (_image != null)
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Image.file(
-                  _image!,
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Nama',
+                  ),
+                  controller: nama,
                 ),
               ),
-            // Tombol untuk mengirim data
-            ElevatedButton(
-              onPressed: () async {
-                // Kirim data ke provider, termasuk gambar
-                Provider.of<Postmenuprovider>(context, listen: false).PostDataMenu(
-                  nama.text,
-                  harga.text,
-                  kategori.text,
-                  _image != null ? _image!.path : '', // Pass path image or empty string
-                );
-              },
-              child: const Text('Kirim'),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Harga',
+                  ),
+                  controller: harga,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Kategori',
+                  ),
+                  controller: kategori,
+                ),
+              ),
+              // Tombol untuk memilih gambar
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: const Text('Pilih Foto'),
+              ),
+              // Menampilkan gambar yang dipilih
+              if (_image != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Image.file(
+                    _image!,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              // Tombol untuk mengirim data
+              ElevatedButton(
+                onPressed: () async {
+                  // Kirim data ke provider, termasuk gambar
+                  Provider.of<Postmenuprovider>(context, listen: false)
+                      .PostDataMenu(
+                    nama.text,
+                    harga.text,
+                    kategori.text,
+                    _image != null ? _image!.path : '',
+                  );
+                },
+                child: const Text('Kirim'),
+              ),
+            ],
+          ),
         ),
       ),
     );

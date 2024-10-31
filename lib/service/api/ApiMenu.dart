@@ -4,7 +4,7 @@ import 'package:warteg/service/model/PostMenuResponese.dart';
 import 'package:http/http.dart' as http;
 
 class ApiMenu {
-  String _baseUrl = 'http://10.0.2.2/warteg/public/api';
+  final _baseUrl = 'http://10.0.2.2/warteg/public/api';
 
   Future<GetMenuResponse> getData() async {
     Map<String, String> headers = {
@@ -16,17 +16,14 @@ class ApiMenu {
         Uri.parse('$_baseUrl/menu'),
         headers: headers,
       );
-
-      // Memeriksa status kode dari respons
       if (response.statusCode == 200) {
-        // Jika server mengembalikan respons OK (status code 200), parse JSON
         return GetMenuResponse.fromJson(json.decode(response.body));
       } else {
-        // Jika server mengembalikan respons dengan error
+       
         throw Exception('Failed to load menu: ${response.statusCode}');
       }
     } catch (e) {
-      // Menangani error yang mungkin terjadi selama permintaan
+      // Menang ani error yang mungkin terjadi selama permintaan
       throw Exception('Failed to load menu: $e');
     }
   }
@@ -63,3 +60,5 @@ class ApiMenu {
     }
   }
 }
+
+

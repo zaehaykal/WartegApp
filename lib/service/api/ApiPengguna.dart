@@ -37,4 +37,16 @@ class ApiPengguna {
       return false; // Penghapusan gagal
     }
   }
+
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/pengguna/login'),
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    return json.decode(response.body);
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:warteg/service/api/ApiUser.dart';
+import 'package:provider/provider.dart'; 
+import 'package:warteg/service/api/ApiUserLogin.dart';
 import 'package:warteg/service/model/UserLoginResponse.dart';
 import 'package:warteg/service/provider/UserLoginProvider.dart';
 
@@ -10,9 +10,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final Apiuser _authService = Apiuser();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -41,31 +44,39 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   void _login() async {
-    final response = await _authService.login(
-      _emailController.text,
-      _passwordController.text,
-    );
+    try {
+      final response = await _authService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
 
-    if (response['message'] == 'Login Berhasil') {
+      if (response['message'] == 'Login Berhasil') {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Login berhasil')));
+
+        // Menyimpan token dan data pengguna menggunakan LoginProvider
+        final loginProvider =
+            Provider.of<UserLoginProvider>(context, listen: false);
+        loginProvider.setToken(response['token']); // Menyimpan token
+
+        print('response '+response['token']);
+
+        // Menyimpan data pengguna dengan menggunakan model UserDataResponse
+        final userData = DataUserLogin.fromJson(response['data']);
+        loginProvider.setUserData(userData); // Menyimpan data pengguna
+        print(userData.name);
+        print(UserResponse(message: 'message', token: 'token',dataUserLogin: userData).toString());
+        // Navigasi ke halaman dashboard
+        await Navigator.pushNamed(context, '/dashPengguna',
+            arguments: userData);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Login gagal')));
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Login berhasil')));
-
-      // Menyimpan token dan data pengguna menggunakan LoginProvider
-      final loginProvider =
-          Provider.of<UserLoginProvider>(context, listen: false);
-      loginProvider.setToken(response['token']); // Menyimpan token
-
-      // Menyimpan data pengguna dengan menggunakan model UserDataResponse
-      final userData = DataUserLogin.fromJson(response['data']);
-      loginProvider.setUserData(userData); // Menyimpan data pengguna
-
-      // Navigasi ke halaman dashboard
-      await Navigator.pushNamed(context, '/dashPengguna', arguments: userData);
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Login gagal')));
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 }

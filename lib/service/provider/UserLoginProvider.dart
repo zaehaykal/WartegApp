@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:warteg/service/api/ApiUserLogin.dart';
 import 'package:warteg/service/model/UserLoginResponse.dart';
 
 class UserLoginProvider with ChangeNotifier {
   final _baseUrl = 'http://10.0.2.2/warteg/public/api';
+  final Apiuser api;
+  UserLoginProvider({required this.api});
   String? _token;
   DataUserLogin? _userData;
 
@@ -30,7 +33,7 @@ class UserLoginProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } else {
-      return false;
+      throw Exception('Failed to login: ${response.statusCode}');
     }
   }
 
@@ -53,11 +56,41 @@ class UserLoginProvider with ChangeNotifier {
     }
   }
 
-  void logout() {
+  Future<bool> logout() async {
+  final token = _token; // Menggunakan token yang sudah ada
+
+  // Pastikan token tidak null sebelum melanjutkan
+  if (token == null) {
+    return false; // Jika tidak ada token, anggap logout gagal
+  }
+
+  final response = await http.post(
+    Uri.parse('$_baseUrl/auth/logout'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    // Jika logout berhasil, reset token dan userData
     _token = null;
     _userData = null;
     notifyListeners();
+    return true; // Menandakan logout berhasil
+  } else {
+    notifyListeners();
+    return false; // Menandakan logout gagal
   }
+}
+
+
+  // void logout() {
+  //   _token = null;
+  //   _userData = null;
+  //   notifyListeners();
+  // }
 
   void setToken(String token) {
     _token = token;

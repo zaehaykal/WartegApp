@@ -1,13 +1,15 @@
-import 'package:carousel_slider/carousel_options.dart';
+// ignore_for_file: file_names
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:warteg/service/api/ApiUser.dart';
+import 'package:provider/provider.dart';
 import 'package:warteg/service/model/UserLoginResponse.dart';
+import 'package:warteg/service/provider/UserLoginProvider.dart';
+import 'package:warteg/page/LoginPage.dart';
 
 class DashboardPengguna extends StatefulWidget {
   final DataUserLogin dataPengguna;
-  const DashboardPengguna({Key? key, required this.dataPengguna})
-      : super(key: key);
+  const DashboardPengguna({super.key, required this.dataPengguna});
 
   @override
   State<DashboardPengguna> createState() => _DashboardPenggunaState();
@@ -16,12 +18,15 @@ class DashboardPengguna extends StatefulWidget {
 class _DashboardPenggunaState extends State<DashboardPengguna> {
   @override
   Widget build(BuildContext context) {
-    final urlImage = 'http://10.0.2.2/warteg/public/uploads';
-    return Scaffold(backgroundColor: Colors.blue[50],
+    Provider.of<UserLoginProvider>(context);
+
+    const urlImage = 'http://10.0.2.2/warteg/public/uploads';
+    return Scaffold(
+      backgroundColor: Colors.blue[50],
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
+            const DrawerHeader(
               child: Text("data"),
             ),
             ListTile(
@@ -53,26 +58,23 @@ class _DashboardPenggunaState extends State<DashboardPengguna> {
       ),
       appBar: AppBar(
         title: Text(widget.dataPengguna.name),
-        
         actions: [
           Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FittedBox(
-            child: CircleAvatar(
-              radius: 50, // Anda dapat mengubah radius sesuai kebutuhan
-              backgroundImage: NetworkImage(
-                  '$urlImage/${widget.dataPengguna.foto}'), // Menggunakan NetworkImage untuk menampilkan gambar dari URL
-              child: widget.dataPengguna.foto.isEmpty
-                  ? Text(
-                      widget.dataPengguna.name[0]
-                          .toUpperCase(), // Menampilkan huruf pertama dari nama jika foto tidak ada
-                      style: TextStyle(
-                          fontSize: 24, color: Colors.white), // Gaya teks
-                    )
-                  : null, // Jika ada foto, tidak perlu menampilkan teks
+            padding: const EdgeInsets.all(8.0),
+            child: FittedBox(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage:
+                    NetworkImage('$urlImage/${widget.dataPengguna.foto}'),
+                child: widget.dataPengguna.foto.isEmpty
+                    ? Text(
+                        widget.dataPengguna.name[0].toUpperCase(),
+                        style: const TextStyle(fontSize: 24, color: Colors.white),
+                      )
+                    : null,
+              ),
             ),
           ),
-        ),
         ],
       ),
       body: Column(
@@ -81,8 +83,8 @@ class _DashboardPenggunaState extends State<DashboardPengguna> {
             options: CarouselOptions(
               height: 200.0,
               autoPlay: true,
-              autoPlayInterval: Duration(seconds: 3),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
+              autoPlayInterval: const Duration(seconds: 3),
+              autoPlayAnimationDuration: const Duration(milliseconds: 800),
               scrollDirection: Axis.horizontal,
             ),
             items: [1, 2, 3, 4, 5].map((i) {
@@ -90,11 +92,11 @@ class _DashboardPenggunaState extends State<DashboardPengguna> {
                 builder: (BuildContext context) {
                   return Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: BoxDecoration(color: Colors.amber),
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: const BoxDecoration(color: Colors.amber),
                       child: Text(
                         'text $i',
-                        style: TextStyle(fontSize: 16.0),
+                        style: const TextStyle(fontSize: 16.0),
                       ));
                 },
               );
@@ -118,7 +120,7 @@ class _DashboardPenggunaState extends State<DashboardPengguna> {
               ),
             ),
           ),
-          const SizedBox(height: 20), // Jarak antara tombol
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _logout,
             child: const Text('Logout'),
@@ -128,28 +130,34 @@ class _DashboardPenggunaState extends State<DashboardPengguna> {
     );
   }
 
-  final Apiuser _apiUser = Apiuser();
-  String? _token; // Simpan token untuk keperluan otorisasi
+void _logout() async {
+  try {
+    final loginProvider = Provider.of<UserLoginProvider>(context, listen: false);
+    bool response = await loginProvider.logout(); // Menggunakan Future<bool>
 
-  void _logout() async {
-    if (_token != null) {
-      try {
-        await _apiUser.logout(_token!);
-        setState(() {
-          _token = null; // Reset token setelah logout
-        });
-        // Tampilkan pesan sukses atau navigasi kembali ke halaman login
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Logout berhasil')),
-        );
+    if (!mounted) return; // Periksa jika widget masih mounted
 
-        await Navigator.pushNamed(context, '/loginPage');
-      } catch (e) {
-        // Tangani kesalahan saat logout
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal logout: $e')),
-        );
-      }
+    if (response) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Logout berhasil')),
+      );
+
+      // Navigasi kembali ke halaman login tanpa memungkinkan pengguna untuk kembali
+      await Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (route) => false, // Menghapus semua rute sebelumnya
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Logout gagal, silakan coba lagi')),
+      );
     }
+  } catch (e) {
+    if (!mounted) return; // Periksa jika widget masih mounted
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Gagal logout: $e')),
+    );
   }
+}
+
 }

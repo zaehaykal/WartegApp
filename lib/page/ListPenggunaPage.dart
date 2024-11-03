@@ -16,8 +16,8 @@ class ListPenggunaPage extends StatelessWidget {
       body: Consumer<GetPenggunaProvider>(
         builder: (context, value, child) {
           if (value.state == ResultState.loading) {
-            return Center(
-              child: const CircularProgressIndicator(),
+            return const Center(
+              child: CircularProgressIndicator(),
             );
           } else if (value.state == ResultState.hasData) {
             final data = value.getPenggunaResponse.data;
@@ -35,11 +35,11 @@ class ListPenggunaPage extends StatelessWidget {
                     child: Column(
                       children: [
                         ListTile(
-                          contentPadding: EdgeInsets.all(8.0),
-                          leading: Icon(Icons.supervised_user_circle_rounded),
+                          contentPadding: const EdgeInsets.all(8.0),
+                          leading: const Icon(Icons.supervised_user_circle_rounded),
                           title: Text(
                             data[index].nama,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,7 @@ class ListPenggunaPage extends StatelessWidget {
                           trailing: Wrap(
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit),
+                                icon: const Icon(Icons.edit),
                                 onPressed: () {
                                   // Aksi jika tombol di sebelah kanan ditekan
                                 },
@@ -62,8 +62,8 @@ class ListPenggunaPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: Divider(
                             thickness: 1,
                             color: Colors.grey,
@@ -74,7 +74,7 @@ class ListPenggunaPage extends StatelessWidget {
                   );
                 });
           } else if (value.state == ResultState.error) {
-            return Text("Tidak ada data yang ditampilkan");
+            return const Text("Tidak ada data yang ditampilkan");
           }
           return Text(value.message);
         },
